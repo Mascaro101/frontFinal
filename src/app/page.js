@@ -14,6 +14,7 @@ const Home = () => {
     const [storeMenu, setStoreMenu] = useState(null);
     const [newReview, setNewReview] = useState("");
     const [hasRated, setHasRated] = useState(false); // Track if the user has rated the store
+    const [enlargesImage, setEnlargesImage] = useState(null);
 
     useEffect(() => {
         // Fetch web stores from the backend
@@ -79,7 +80,6 @@ const Home = () => {
             return;
         }
 
-        // Retrieve the token from localStorage
         const token = localStorage.getItem("token");
 
         if (!token) {
@@ -148,6 +148,14 @@ const Home = () => {
         }
     };
 
+    const handleImageClick = (image) => {
+        setEnlargesImage(image); // Set the image to be enlarged
+    };
+
+    const handleCloseImage = () => {
+        setEnlargesImage(null); // Close the enlarged image
+    };
+
     if (error) return <div className={styles.error}>Error: {error}</div>;
 
     return (
@@ -189,6 +197,7 @@ const Home = () => {
                                                     src={`http://localhost:3000/${image}`}
                                                     alt={`Store Image ${index + 1}`}
                                                     className={styles.storeImage}
+                                                    onClick={() => handleImageClick(image)} // Trigger enlarge on click
                                                 />
                                             ))}
                                         </div>
@@ -248,9 +257,18 @@ const Home = () => {
                 <a href="#">Contact</a>
                 <a href="#">Privacy</a>
             </footer>
+
+            {enlargesImage && (
+                <div className={styles.enlargedImageModal} onClick={handleCloseImage}>
+                    <img
+                        src={`http://localhost:3000/${enlargesImage}`}
+                        alt="Enlarged view"
+                        className={styles.enlargedImage}
+                    />
+                </div>
+            )}
         </div>
     );
 };
 
 export default Home;
-

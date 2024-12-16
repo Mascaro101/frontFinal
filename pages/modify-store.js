@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
+import styles from '../styles/ModifyStore.module.css'; // Importing the CSS module
 
 const ModifyStore = () => {
     const [CIF, setCIF] = useState('');
@@ -31,19 +32,23 @@ const ModifyStore = () => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:3000/api/store/${CIF}`, {
-                storeName,
-                address,
-                city,
-                email,
-                contactNumber,
-                pageId,
-                updatedAt: new Date().toISOString()
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
+            await axios.put(
+                `http://localhost:3000/api/store/${CIF}`,
+                {
+                    storeName,
+                    address,
+                    city,
+                    email,
+                    contactNumber,
+                    pageId,
+                    updatedAt: new Date().toISOString(),
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 }
-            });
+            );
             router.push('/stores');
         } catch (err) {
             console.error('Error modifying store:', err);
@@ -51,17 +56,61 @@ const ModifyStore = () => {
     };
 
     return (
-        <div>
+        <div className={styles['modify-store-container']}>
             <h1>Modify Store</h1>
-            <input type="text" placeholder="CIF" value={CIF} onChange={(e) => setCIF(e.target.value)} required />
-            <button onClick={handleFetch}>Fetch Store</button>
+            <input
+                type="text"
+                placeholder="CIF"
+                value={CIF}
+                onChange={(e) => setCIF(e.target.value)}
+                required
+            />
+            <button className={`${styles['fetch-button']}`} onClick={handleFetch}>
+                Fetch Store
+            </button>
             <form onSubmit={handleSubmit}>
-                <input type="text" placeholder="Store Name" value={storeName} onChange={(e) => setStoreName(e.target.value)} required />
-                <input type="text" placeholder="Address" value={address} onChange={(e) => setAddress(e.target.value)} required />
-                <input type="text" placeholder="City" value={city} onChange={(e) => setCity(e.target.value)} required />
-                <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                <input type="text" placeholder="Contact Number" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} required />
-                <input type="number" placeholder="Page ID" value={pageId} onChange={(e) => setPageId(e.target.value)} required />
+                <input
+                    type="text"
+                    placeholder="Store Name"
+                    value={storeName}
+                    onChange={(e) => setStoreName(e.target.value)}
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="Address"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="City"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    required
+                />
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="Contact Number"
+                    value={contactNumber}
+                    onChange={(e) => setContactNumber(e.target.value)}
+                    required
+                />
+                <input
+                    type="number"
+                    placeholder="Page ID"
+                    value={pageId}
+                    onChange={(e) => setPageId(e.target.value)}
+                    required
+                />
                 <button type="submit">Modify Store</button>
             </form>
         </div>

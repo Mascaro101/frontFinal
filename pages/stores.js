@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
+import styles from '../styles/Stores.module.css'; // Importing the CSS module
 
 const Stores = () => {
     const [stores, setStores] = useState([]);
@@ -20,7 +21,19 @@ const Stores = () => {
     }, []);
 
     return (
-        <div>
+        <div className={styles['stores-container']}>
+            {/* Buttons moved to the top */}
+            <div className={styles['button-group']}>
+                <Link href="/create-store">
+                    <button>Create Store</button>
+                </Link>
+                <Link href="/modify-store">
+                    <button>Modify Store</button>
+                </Link>
+                <Link href="/delete-store">
+                    <button>Delete Store</button>
+                </Link>
+            </div>
             <h1>All Stores</h1>
             {error && <p style={{ color: 'red' }}>Error: {error}</p>}
             <ul>
@@ -36,17 +49,6 @@ const Stores = () => {
                     <p>No stores available</p>
                 )}
             </ul>
-            <div>
-                <Link href="/create-store">
-                    <button>Create Store</button>
-                </Link>
-                <Link href="/modify-store">
-                    <button>Modify Store</button>
-                </Link>
-                <Link href="/delete-store">
-                    <button>Delete Store</button>
-                </Link>
-            </div>
         </div>
     );
 };

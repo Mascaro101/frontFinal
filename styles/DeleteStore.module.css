@@ -1,0 +1,56 @@
+/* Delete Store Page Container */
+.delete-store-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 24px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    font-family: 'Inter', sans-serif;
+}
+
+.delete-store-container h1 {
+    font-size: 2rem;
+    color: var(--button-primary-hover, #4a4a4a);
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.delete-store-container input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 16px;
+    border: 1px solid var(--gray-alpha-200, #ddd);
+    border-radius: 6px;
+    font-size: 1rem;
+    background: #f9f9f9;
+    transition: border-color 0.3s, box-shadow 0.2s;
+}
+
+.delete-store-container input:focus {
+    outline: none;
+    border-color: var(--button-primary-hover, #4a4a4a);
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.delete-store-container button {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #fff;
+    background: #d9534f; /* Red for delete button */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.delete-store-container button:hover {
+    background-color: #c9302c;
+    transform: scale(1.02);
+}

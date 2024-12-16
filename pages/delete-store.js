@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
+import styles from '../styles/DeleteStore.module.css';
 
 const DeleteStore = () => {
     const [CIF, setCIF] = useState('');
@@ -12,11 +13,11 @@ const DeleteStore = () => {
             const token = localStorage.getItem('token');
             await axios.delete('http://localhost:3000/api/store', {
                 headers: {
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${token}`,
                 },
                 data: {
-                    cif: CIF
-                }
+                    cif: CIF,
+                },
             });
             router.push('/stores');
         } catch (err) {
@@ -25,11 +26,19 @@ const DeleteStore = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <h1>Delete Store</h1>
-            <input type="text" placeholder="CIF" value={CIF} onChange={(e) => setCIF(e.target.value)} required />
-            <button type="submit">Delete Store</button>
-        </form>
+        <div className={styles['delete-store-container']}>
+            <form onSubmit={handleSubmit}>
+                <h1>Delete Store</h1>
+                <input
+                    type="text"
+                    placeholder="CIF"
+                    value={CIF}
+                    onChange={(e) => setCIF(e.target.value)}
+                    required
+                />
+                <button type="submit">Delete Store</button>
+            </form>
+        </div>
     );
 };
 

@@ -32,6 +32,33 @@
   }
 }
 
+/* Enlarged Image Modal */
+.enlargedImageModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  cursor: pointer;
+}
+
+.enlargedImage {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.enlargedImageModal img {
+  cursor: zoom-out;
+}
+
 /* Navigation Bar */
 .nav ul {
   display: flex;
@@ -103,7 +130,7 @@
 
 .main button {
   all: unset;
-  box-sizing: border-box; /* Fixes padding overflow */
+  box-sizing: border-box;
   cursor: pointer;
   display: block;
   width: 100%;
@@ -115,7 +142,7 @@
   font-size: 1rem;
   font-weight: bold;
   transition: background-color 0.2s, transform 0.15s;
-  overflow: hidden; /* Ensures no content spills */
+  overflow: hidden;
 }
 
 .main button:hover {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-
+import styles from '../styles/Profile.module.css'; // Importing the CSS module
 const Profile = () => {
     const [user, setUser] = useState(null);
     const [username, setUsername] = useState('');
@@ -26,8 +26,8 @@ const Profile = () => {
                 // Fetch user profile information
                 const response = await axios.get('http://localhost:3000/api/user/profile', {
                     headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+                        Authorization: `Bearer ${token}`,
+                    },
                 });
                 setUser(response.data);
                 setUsername(response.data.username);
@@ -50,8 +50,8 @@ const Profile = () => {
             const token = localStorage.getItem('token');
             await axios.delete('http://localhost:3000/api/user/delete', {
                 headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                    Authorization: `Bearer ${token}`,
+                },
             });
             localStorage.removeItem('token');
             router.push('/register');
@@ -64,19 +64,23 @@ const Profile = () => {
     const handleSave = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.put('http://localhost:3000/api/user/modify', {
-                username,
-                email,
-                password,
-                age,
-                city,
-                interests,
-                allowOffer
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
+            await axios.put(
+                'http://localhost:3000/api/user/modify',
+                {
+                    username,
+                    email,
+                    password,
+                    age,
+                    city,
+                    interests,
+                    allowOffer,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 }
-            });
+            );
             setUser({ ...user, username, email, password, age, city, interests, allowOffer });
         } catch (err) {
             setError(err.message);
@@ -84,44 +88,48 @@ const Profile = () => {
         }
     };
 
-    if (error) return <div>Error: {error}</div>;
-    if (!user) return <div>Loading...</div>;
+    if (error) return <div className={styles.error}>Error: {error}</div>;
+    if (!user) return <div className={styles.loading}>Loading...</div>;
 
     return (
-        <div>
-            <h1>User Profile</h1>
-            <p><strong>Username:</strong> {user.username}</p>
+        <div className={styles['profile-container']}>
+            <h1 className={styles['title']}>User Profile</h1>
             <input
+                className={styles['input']}
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Username"
             />
             <input
+                className={styles['input']}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
             />
             <input
+                className={styles['input']}
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
             />
             <input
+                className={styles['input']}
                 type="number"
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
                 placeholder="Age"
             />
             <input
+                className={styles['input']}
                 type="text"
                 value={interests.join(', ')}
                 onChange={(e) => setInterests(e.target.value.split(', '))}
                 placeholder="Interests (comma separated)"
             />
-            <label>
+            <label className={styles['label']}>
                 <input
                     type="checkbox"
                     checked={allowOffer}
@@ -129,8 +137,12 @@ const Profile = () => {
                 />
                 Allow Offers
             </label>
-            <button onClick={handleSave}>Save</button>
-            <button onClick={handleDelete}>Delete User</button>
+            <button className={styles['button']} onClick={handleSave}>
+                Save
+            </button>
+            <button className={`${styles['button']} ${styles['delete']}`} onClick={handleDelete}>
+                Delete User
+            </button>
         </div>
     );
 };
