@@ -1,0 +1,102 @@
+.container {
+    font-family: 'Inter', sans-serif;
+    margin: 20px auto;
+    max-width: 800px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    color: #333;
+}
+
+.title {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 16px;
+    color: var(--button-primary-hover, #4a4a4a);
+}
+
+.button {
+    background-color: var(--button-primary-hover, #4a4a4a);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.button:hover {
+    background-color: var(--button-secondary-hover, #f5f5f5);
+    color: #333;
+    transform: scale(1.05);
+}
+
+.fileInput {
+    display: block;
+    margin: 20px 0;
+}
+
+.imagesContainer, .textContainer, .usersContainer {
+    margin-top: 24px;
+}
+
+.subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+    color: var(--button-primary-hover, #4a4a4a);
+}
+
+.image {
+    max-width: 100%;
+    height: auto;
+    margin: 8px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.textInput {
+    width: calc(100% - 24px);
+    padding: 12px;
+    margin-right: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.form {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.userCard {
+    padding: 16px;
+    margin-top: 16px;
+    border: 1px solid var(--gray-alpha-200, rgba(0, 0, 0, 0.08));
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.userCard:hover {
+    background-color: var(--button-secondary-hover, #f5f5f5);
+    transform: translateY(-2px);
+}
+
+.error {
+    color: red;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.loading {
+    text-align: center;
+    font-size: 1.25rem;
+    margin-top: 20px;
+}

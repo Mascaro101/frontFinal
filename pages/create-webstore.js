@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
+import styles from '../styles/CreateWebStore.module.css';
 
 const CreateWebStore = () => {
     const [storeName, setStoreName] = useState('');
@@ -40,20 +41,86 @@ const CreateWebStore = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <h1>Create Web Store</h1>
-            <input type="text" placeholder="Store Name" value={storeName} onChange={(e) => setStoreName(e.target.value)} required />
-            <input type="text" placeholder="Address" value={address} onChange={(e) => setAddress(e.target.value)} required />
-            <input type="text" placeholder="City" value={city} onChange={(e) => setCity(e.target.value)} required />
-            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            <input type="text" placeholder="Contact Number" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} required />
-            <input type="number" placeholder="Page ID" value={pageId} onChange={(e) => setPageId(e.target.value)} required />
-            <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-            <input type="text" placeholder="Activity" value={activity} onChange={(e) => setActivity(e.target.value)} required />
-            <input type="text" placeholder="Resume" value={resume} onChange={(e) => setResume(e.target.value)} required />
-            <button type="submit">Create Web Store</button>
+        <form onSubmit={handleSubmit} className={styles.form}>
+            <h1 className={styles.title}>Create Web Store</h1>
+            <input
+                type="text"
+                placeholder="Store Name"
+                value={storeName}
+                onChange={(e) => setStoreName(e.target.value)}
+                required
+                className={styles.input}
+            />
+            <input
+                type="text"
+                placeholder="Address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                required
+                className={styles.input}
+            />
+            <input
+                type="text"
+                placeholder="City"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                required
+                className={styles.input}
+            />
+            <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className={styles.input}
+            />
+            <input
+                type="text"
+                placeholder="Contact Number"
+                value={contactNumber}
+                onChange={(e) => setContactNumber(e.target.value)}
+                required
+                className={styles.input}
+            />
+            <input
+                type="number"
+                placeholder="Page ID"
+                value={pageId}
+                onChange={(e) => setPageId(e.target.value)}
+                required
+                className={styles.input}
+            />
+            <input
+                type="text"
+                placeholder="Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                className={styles.input}
+            />
+            <input
+                type="text"
+                placeholder="Activity"
+                value={activity}
+                onChange={(e) => setActivity(e.target.value)}
+                required
+                className={styles.input}
+            />
+            <input
+                type="text"
+                placeholder="Resume"
+                value={resume}
+                onChange={(e) => setResume(e.target.value)}
+                required
+                className={styles.input}
+            />
+            <button type="submit" className={styles.button}>
+                Create Web Store
+            </button>
         </form>
     );
+    
 };
 
 export default CreateWebStore;

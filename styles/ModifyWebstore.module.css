@@ -1,0 +1,93 @@
+.formContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+    padding: 20px;
+}
+
+.form {
+    font-family: 'Inter', sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--button-primary-hover, #4a4a4a);
+}
+
+.input {
+    width: calc(100% - 24px);
+    padding: 12px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--button-primary-hover, #4a4a4a);
+    box-shadow: 0 0 5px rgba(74, 74, 74, 0.3);
+}
+
+.button {
+    display: inline-block;
+    background-color: var(--button-primary-hover, #4a4a4a);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s;
+    margin-right: 8px;
+}
+
+.button:hover {
+    background-color: var(--button-secondary-hover, #f5f5f5);
+    color: #333;
+    transform: scale(1.05);
+}
+
+.fetchButton {
+    background-color: #0070f3;
+}
+
+.fetchButton:hover {
+    background-color: #005bb5;
+}
+
+.error {
+    color: red;
+    font-weight: bold;
+    margin-top: 16px;
+    text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .form {
+        padding: 16px;
+    }
+
+    .input {
+        width: calc(100% - 16px);
+        padding: 10px;
+    }
+
+    .button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+}
