@@ -1,95 +1,86 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+import Link from 'next/link';
+import axios from 'axios';
+import { useState, useEffect } from 'react';
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+const Home = () => {
+    const [webStores, setWebStores] = useState([]);
+    const [error, setError] = useState(null);
+    const [userToken, setUserToken] = useState(null);
+    const [storeToken, setStoreToken] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        const fetchWebStores = async () => {
+            try {
+                const response = await axios.get('http://localhost:3000/api/webStore');
+                console.log('API Response:', response.data); // Debug the API response
+                setWebStores(response.data);
+            } catch (err) {
+                setError(err.message);
+                console.error('Error fetching web stores:', err);
+            }
+        };
+        fetchWebStores();
+
+        // Check for user token in local storage
+        const token = localStorage.getItem('token');
+        if (token) {
+            setUserToken(token);
+
+            // Decode the JWT token to check if the user is an admin
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+
+            const decodedToken = JSON.parse(jsonPayload);
+            if (decodedToken.role === 'admin') {
+                setIsAdmin(true);
+            }
+        }
+
+        // Check for store token in local storage
+        const storeToken = localStorage.getItem('storeToken');
+        if (storeToken) {
+            setStoreToken(storeToken);
+        }
+    }, []);
+
+    return (
+        <div>
+            <h1>Welcome to the API Frontend</h1>
+            <nav>
+                <ul>
+                    <li><Link href="/webStore/new">Create Web Store</Link></li>
+                    <li><Link href="/login">Login</Link></li>
+                    <li><Link href="/register">Register</Link></li>
+                    {userToken && !storeToken && <li><Link href="/profile">Personal Profile</Link></li>}
+                    {storeToken && <li><Link href="/store-menu">Store Menu</Link></li>}
+                    {isAdmin && <li><Link href="/stores">Stores</Link></li>}
+                </ul>
+            </nav>
+            <div>
+                <h2>Available Web Stores</h2>
+                {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+                <ul>
+                    {webStores.length > 0 ? (
+                        webStores.map((webStore) => (
+                            <li key={webStore.storeId}>
+                                <Link href={`/webStore/${webStore.storeId}`}>
+                                    {webStore.title || 'Unnamed Store'}
+                                </Link>
+                            </li>
+                        ))
+                    ) : (
+                        <p>No web stores available</p>
+                    )}
+                </ul>
+            </div>
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
-}
+    );
+};
+
+export default Home;
