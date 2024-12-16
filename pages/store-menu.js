@@ -85,14 +85,19 @@ const StoreMenu = () => {
     const handleFetchUsers = async () => {
         try {
             const token = localStorage.getItem('storeToken');
+            if (!store?.CIF) {
+                console.error('Store CIF is undefined.');
+                setError('Invalid store information.');
+                return;
+            }
             const response = await axios.get(`http://localhost:3000/api/webStore/${store.CIF}/usersInSameCity`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
             });
-            console.log('Fetched users in the same city:', response.data);
+            console.log('Fetched users:', response.data);
             setUsers(response.data);
         } catch (err) {
-            console.error('Error fetching users:', err);
-            setError(err.message || 'Error fetching users');
+            console.error('Error fetching users:', err.response?.data || err.message);
+            setError(err.response?.data?.error || 'Failed to fetch users.');
         }
     };
 

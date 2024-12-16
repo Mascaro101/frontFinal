@@ -6,36 +6,35 @@ import styles from "./page.module.css";
 
 const Home = () => {
     const [webStores, setWebStores] = useState([]);
+    const [groupedWebStoresByCity, setGroupedWebStoresByCity] = useState({});
+    const [groupedWebStoresByActivity, setGroupedWebStoresByActivity] = useState({});
     const [selectedWebStore, setSelectedWebStore] = useState(null);
     const [error, setError] = useState(null);
     const [userToken, setUserToken] = useState(null);
     const [storeToken, setStoreToken] = useState(null);
     const [isAdmin, setIsAdmin] = useState(false);
-    const [storeMenu, setStoreMenu] = useState(null);
     const [newReview, setNewReview] = useState("");
-    const [hasRated, setHasRated] = useState(false); // Track if the user has rated the store
-    const [enlargesImage, setEnlargesImage] = useState(null);
+    const [sortOrder, setSortOrder] = useState("newest");
+    const [hasRated, setHasRated] = useState(false);
+    const [enlargedImage, setEnlargedImage] = useState(null);
 
     useEffect(() => {
-        // Fetch web stores from the backend
         const fetchWebStores = async () => {
             try {
                 const response = await axios.get("http://localhost:3000/api/webStore");
-                setWebStores(response.data);
+                const sortedStores = sortWebStores(response.data, "newest");
+                setWebStores(sortedStores);
             } catch (err) {
                 setError(err.message);
             }
         };
         fetchWebStores();
 
-        // Retrieve tokens from local storage
         const token = localStorage.getItem("token");
         const storeToken = localStorage.getItem("storeToken");
 
         if (token) {
             setUserToken(token);
-
-            // Decode the token to check the user role
             try {
                 const base64Url = token.split(".")[1];
                 const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
@@ -60,14 +59,52 @@ const Home = () => {
         }
     }, []);
 
+    const sortWebStores = (stores, order) => {
+        if (order === "city") {
+            const groupedByCity = stores.reduce((acc, store) => {
+                if (!acc[store.city]) acc[store.city] = [];
+                acc[store.city].push(store);
+                return acc;
+            }, {});
+            setGroupedWebStoresByCity(groupedByCity);
+            return stores;
+        }
+
+        if (order === "activity") {
+            const groupedByActivity = stores.reduce((acc, store) => {
+                if (!acc[store.activity]) acc[store.activity] = [];
+                acc[store.activity].push(store);
+                return acc;
+            }, {});
+            setGroupedWebStoresByActivity(groupedByActivity);
+            return stores;
+        }
+
+        if (order === "rating") {
+            return [...stores].sort((a, b) => b.reviews.scoring - a.reviews.scoring);
+        }
+
+        return [...stores].sort((a, b) => {
+            const dateA = new Date(a.createdAt);
+            const dateB = new Date(b.createdAt);
+            return order === "newest" ? dateB - dateA : dateA - dateB;
+        });
+    };
+
+    const handleSortChange = (order) => {
+        setSortOrder(order);
+        const sortedStores = sortWebStores(webStores, order);
+        setWebStores(sortedStores);
+    };
+
     const handleWebStoreClick = async (storeId) => {
         if (selectedWebStore?.storeId === storeId) {
-            setSelectedWebStore(null); // Collapse the details
+            setSelectedWebStore(null);
         } else {
             try {
                 const response = await axios.get(`http://localhost:3000/api/webStore/${storeId}`);
-                setSelectedWebStore(response.data); // Display the details
-                setHasRated(false); // Reset the rating status when selecting a new store
+                setSelectedWebStore(response.data);
+                setHasRated(false);
             } catch (err) {
                 setError(err.message);
             }
@@ -75,86 +112,58 @@ const Home = () => {
     };
 
     const handleAddReview = async () => {
-        if (!newReview.trim() || !selectedWebStore) {
-            console.log("Review is empty or no store selected");
+        if (!newReview.trim() || !selectedWebStore) return;
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("You must be logged in to add a review.");
             return;
         }
 
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-            alert("You must be logged in to add a review.");
-            return; // Stop if no token is found
-        }
-
-        console.log("Submitting review:", newReview);
-
         try {
-            // Check request data being sent
-            console.log("Request data:", { review: newReview, storeId: selectedWebStore.storeId });
-
-            const response = await axios.patch(
+            await axios.patch(
                 `http://localhost:3000/api/webStore/${selectedWebStore.storeId}/addReview`,
                 { review: newReview },
-                { headers: { Authorization: `Bearer ${token}` } } // Send token in the headers
+                { headers: { Authorization: `Bearer ${token}` } }
             );
-            
-            console.log("Review added successfully:", response.data);
 
-            // Fetch updated store details to show new review
-            const updatedStoreResponse = await axios.get(`http://localhost:3000/api/webStore/${selectedWebStore.storeId}`);
-            console.log("Updated store data after review:", updatedStoreResponse.data);
-
-            setSelectedWebStore(updatedStoreResponse.data); // Update store with new review
-            setNewReview(""); // Clear input field after review
+            const updatedStore = await axios.get(`http://localhost:3000/api/webStore/${selectedWebStore.storeId}`);
+            setSelectedWebStore(updatedStore.data);
+            setNewReview("");
         } catch (err) {
-            console.error("Error adding review:", err.message);
-            setError(err.message);  // Set the error state if something goes wrong
+            setError(err.message);
         }
     };
 
     const handleRatingChange = async (change) => {
         if (hasRated) {
             alert("You have already rated this store.");
-            return; // Prevent rating if the user has already rated
+            return;
         }
 
         const token = localStorage.getItem("token");
-
         if (!token) {
             alert("You must be logged in to rate the store.");
-            return; // Stop if no token is found
+            return;
         }
 
         try {
-            // Send rating change request to the backend
-            const response = await axios.patch(
+            await axios.patch(
                 `http://localhost:3000/api/webStore/${selectedWebStore.storeId}/rate`,
                 { change },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            console.log("Rating updated successfully:", response.data);
-
-            // Fetch updated store details to show the new rating
-            const updatedStoreResponse = await axios.get(`http://localhost:3000/api/webStore/${selectedWebStore.storeId}`);
-            console.log("Updated store data after rating:", updatedStoreResponse.data);
-
-            setSelectedWebStore(updatedStoreResponse.data); // Update store with new rating
-            setHasRated(true); // Mark that the user has rated the store
+            const updatedStore = await axios.get(`http://localhost:3000/api/webStore/${selectedWebStore.storeId}`);
+            setSelectedWebStore(updatedStore.data);
+            setHasRated(true);
         } catch (err) {
-            console.error("Error updating rating:", err.message);
-            setError(err.message);  // Set the error state if something goes wrong
+            setError(err.message);
         }
     };
 
-    const handleImageClick = (image) => {
-        setEnlargesImage(image); // Set the image to be enlarged
-    };
-
-    const handleCloseImage = () => {
-        setEnlargesImage(null); // Close the enlarged image
-    };
+    const handleImageClick = (image) => setEnlargedImage(image);
+    const handleCloseImage = () => setEnlargedImage(null);
 
     if (error) return <div className={styles.error}>Error: {error}</div>;
 
@@ -172,83 +181,69 @@ const Home = () => {
 
             <main className={styles.main}>
                 <h1>Available Web Stores</h1>
-                {webStores.length > 0 ? (
-                    <ul>
-                        {webStores.map((webStore) => (
-                            <li key={webStore.storeId}>
-                                <button
-                                    onClick={() => handleWebStoreClick(webStore.storeId)}
-                                    className={styles.storeButton}
-                                >
-                                    {webStore.title || "Unnamed Store"}
-                                </button>
-                                {selectedWebStore?.storeId === webStore.storeId && (
-                                    <div className={styles.storeDetails}>
-                                        <h2>{selectedWebStore.title || "Unnamed Store"}</h2>
-                                        <p><strong>Activity:</strong> {selectedWebStore.activity}</p>
-                                        <p><strong>City:</strong> {selectedWebStore.city}</p>
-                                        <p><strong>Resume:</strong> {selectedWebStore.resume}</p>
 
-                                        <h3>Images:</h3>
-                                        <div className={styles.images}>
-                                            {selectedWebStore.imagesArray.map((image, index) => (
-                                                <img
-                                                    key={index}
-                                                    src={`http://localhost:3000/${image}`}
-                                                    alt={`Store Image ${index + 1}`}
-                                                    className={styles.storeImage}
-                                                    onClick={() => handleImageClick(image)} // Trigger enlarge on click
-                                                />
-                                            ))}
-                                        </div>
+                <div className={styles.sortOptions}>
+                    <label>Sort by:</label>
+                    {["newest", "oldest", "city", "activity", "rating"].map((order) => (
+                        <button
+                            key={order}
+                            onClick={() => handleSortChange(order)}
+                            className={sortOrder === order ? styles.activeSortButton : styles.sortButton}
+                        >
+                            {order.charAt(0).toUpperCase() + order.slice(1)}
+                        </button>
+                    ))}
+                </div>
 
-                                        <h3>Texts:</h3>
-                                        <ul>
-                                            {selectedWebStore.textsArray.map((text, index) => (
-                                                <li key={index}>{text}</li>
-                                            ))}
-                                        </ul>
+                {sortOrder === "city" || sortOrder === "activity"
+                    ? Object.entries(sortOrder === "city" ? groupedWebStoresByCity : groupedWebStoresByActivity).map(([key, stores]) => (
+                          <div key={key}>
+                              <h2>{key}</h2>
+                              <ul>
+                                  {stores.map((store) => (
+                                      <li key={store.storeId}>
+                                          <button onClick={() => handleWebStoreClick(store.storeId)}>
+                                              {store.title || "Unnamed Store"}
+                                          </button>
+                                          {selectedWebStore?.storeId === store.storeId && (
+                                              <StoreDetails
+                                                  store={selectedWebStore}
+                                                  onReviewChange={setNewReview}
+                                                  onAddReview={handleAddReview}
+                                                  onRate={handleRatingChange}
+                                                  newReview={newReview}
+                                                  hasRated={hasRated}
+                                                  onImageClick={handleImageClick}
+                                              />
+                                          )}
+                                      </li>
+                                  ))}
+                              </ul>
+                          </div>
+                      ))
+                    : webStores.map((store) => (
+                          <li key={store.storeId}>
+                              <button onClick={() => handleWebStoreClick(store.storeId)}>
+                                  {store.title || "Unnamed Store"}
+                              </button>
+                              {selectedWebStore?.storeId === store.storeId && (
+                                  <StoreDetails
+                                      store={selectedWebStore}
+                                      onReviewChange={setNewReview}
+                                      onAddReview={handleAddReview}
+                                      onRate={handleRatingChange}
+                                      newReview={newReview}
+                                      hasRated={hasRated}
+                                      onImageClick={handleImageClick}
+                                  />
+                              )}
+                          </li>
+                      ))}
 
-                                        <h3>Reviews:</h3>
-                                        <p><strong>Scoring:</strong> {selectedWebStore.reviews.scoring}</p>
-                                        <p><strong>Total Ratings:</strong> {selectedWebStore.reviews.totalRatings}</p>
-                                        <ul>
-                                            {selectedWebStore.reviews.reviews.length > 0 ? (
-                                                selectedWebStore.reviews.reviews.map((review, index) => (
-                                                    <li key={index}>{review}</li>
-                                                ))
-                                            ) : (
-                                                <li>No reviews available</li>
-                                            )}
-                                        </ul>
-
-                                        <div className={styles.addReview}>
-                                            <h3>Add a Review:</h3>
-                                            <textarea
-                                                value={newReview}
-                                                onChange={(e) => setNewReview(e.target.value)}
-                                                placeholder="Write your review here..."
-                                                className={styles.reviewInput}
-                                            />
-                                            <button onClick={handleAddReview} className={styles.reviewButton}>
-                                                Submit Review
-                                            </button>
-
-                                            <h3>Rate this store:</h3>
-                                            <button onClick={() => handleRatingChange(1)} className={styles.likeButton} disabled={hasRated}>
-                                                👍 Like
-                                            </button>
-                                            <button onClick={() => handleRatingChange(-1)} className={styles.dislikeButton} disabled={hasRated}>
-                                                👎 Dislike
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>No web stores available</p>
+                {enlargedImage && (
+                    <div className={styles.enlargedImageModal} onClick={handleCloseImage}>
+                        <img src={`http://localhost:3000/${enlargedImage}`} alt="Enlarged view" className={styles.enlargedImage} />
+                    </div>
                 )}
             </main>
 
@@ -257,18 +252,61 @@ const Home = () => {
                 <a href="#">Contact</a>
                 <a href="#">Privacy</a>
             </footer>
-
-            {enlargesImage && (
-                <div className={styles.enlargedImageModal} onClick={handleCloseImage}>
-                    <img
-                        src={`http://localhost:3000/${enlargesImage}`}
-                        alt="Enlarged view"
-                        className={styles.enlargedImage}
-                    />
-                </div>
-            )}
         </div>
     );
 };
+
+const StoreDetails = ({ store, onReviewChange, onAddReview, onRate, newReview, hasRated, onImageClick }) => (
+    <div className={styles.storeDetails}>
+        <h2>{store.title || "Unnamed Store"}</h2>
+        <p><strong>Activity:</strong> {store.activity}</p>
+        <p><strong>City:</strong> {store.city}</p>
+        <p><strong>Resume:</strong> {store.resume}</p>
+
+        <h3>Images:</h3>
+        <div className={styles.images}>
+            {store.imagesArray.map((image, index) => (
+                <img
+                    key={index}
+                    src={`http://localhost:3000/${image}`}
+                    alt={`Store Image ${index + 1}`}
+                    className={styles.storeImage}
+                    onClick={() => onImageClick(image)}
+                />
+            ))}
+        </div>
+
+        <h3>Texts:</h3>
+        <ul>
+            {store.textsArray.map((text, index) => (
+                <li key={index}>{text}</li>
+            ))}
+        </ul>
+
+        <h3>Reviews:</h3>
+        <p><strong>Scoring:</strong> {store.reviews.scoring}</p>
+        <p><strong>Total Ratings:</strong> {store.reviews.totalRatings}</p>
+        <ul>
+            {store.reviews.reviews.length > 0
+                ? store.reviews.reviews.map((review, index) => <li key={index}>{review}</li>)
+                : <li>No reviews available</li>}
+        </ul>
+
+        <div className={styles.addReview}>
+            <h3>Add a Review:</h3>
+            <textarea
+                value={newReview}
+                onChange={(e) => onReviewChange(e.target.value)}
+                placeholder="Write your review here..."
+                className={styles.reviewInput}
+            />
+            <button onClick={onAddReview} className={styles.reviewButton}>Submit Review</button>
+
+            <h3>Rate this store:</h3>
+            <button onClick={() => onRate(1)} className={styles.likeButton} disabled={hasRated}>👍 Like</button>
+            <button onClick={() => onRate(-1)} className={styles.dislikeButton} disabled={hasRated}>👎 Dislike</button>
+        </div>
+    </div>
+);
 
 export default Home;

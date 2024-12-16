@@ -106,12 +106,12 @@
 }
 
 .main ul {
-  list-style: none;
+  list-style: none; /* Ensure no dots */
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 12px; /* Add spacing between items */
 }
 
 .main li {
@@ -127,6 +127,7 @@
   background-color: var(--button-secondary-hover);
   transform: translateY(-2px);
 }
+
 
 .main button {
   all: unset;
@@ -249,4 +250,50 @@
   .storeImage {
     max-width: 100px;
   }
+}
+
+/* Sort Options */
+.sortOptions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.sortOptions label {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.sortButton {
+  all: unset;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: var(--button-primary-hover);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.15s;
+}
+
+.sortButton:hover {
+  background-color: var(--button-secondary-hover);
+  color: #333;
+  transform: translateY(-1px);
+}
+
+.activeSortButton {
+  background-color: var(--button-secondary-hover);
+  color: #333;
+  font-weight: bold;
+  border: 2px solid var(--button-primary-hover);
+}
+
+/* City Headers */
+.main h2 {
+  margin-top: 20px;
+  color: var(--button-primary-hover);
+  font-size: 1.5rem;
 }
